@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Quiz Maker</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:
+    linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+    url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80');
+
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+}
+
+.hero{
+    text-align:center;
+    color:white;
+    padding:50px 20px;
+}
+
+.hero h1{
+    font-size:60px;
+    margin-bottom:10px;
+    text-shadow:2px 2px 10px rgba(0,0,0,.5);
+}
+
+.hero p{
+    font-size:22px;
+}
+
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    padding-bottom:40px;
+}
+
+.card{
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    padding:25px;
+    border-radius:20px;
+
+    color:white;
+
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+
+    margin-bottom:30px;
+}
+
+h2{
+    margin-bottom:20px;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.add-btn{
+    background:#22c55e;
+    color:white;
+}
+
+.start-btn{
+    background:#2563eb;
+    color:white;
+}
+
+.next-btn{
+    background:#f59e0b;
+    color:white;
+    margin-top:20px;
+}
+
+.option{
+    display:block;
+    background:rgba(255,255,255,0.2);
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.option input{
+    width:auto;
+    margin-right:10px;
+}
+
+#quizSection,
+#resultSection{
+    display:none;
+}
+
+.question-box{
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+.score{
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    color:#22c55e;
+}
+
+footer{
+    text-align:center;
+    color:white;
+    padding:20px;
+}
+
+@media(max-width:768px){
+
+.hero h1{
+    font-size:40px;
+}
+
+.hero p{
+    font-size:18px;
+}
+
+.question-box{
+    font-size:20px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>🎯 Online Quiz Maker</h1>
+    <p>Create Interactive Quizzes & Test Knowledge</p>
+</div>
+
+<div class="container">
+
+    <!-- Quiz Creator -->
+
+    <div class="card">
+
+        <h2>Create Quiz Question</h2>
+
+        <input type="text" id="question"
+        placeholder="Enter Question">
+
+        <input type="text" id="option1"
+        placeholder="Option 1">
+
+        <input type="text" id="option2"
+        placeholder="Option 2">
+
+        <input type="text" id="option3"
+        placeholder="Option 3">
+
+        <input type="text" id="option4"
+        placeholder="Option 4">
+
+        <select id="correct">
+            <option value="">Select Correct Answer</option>
+            <option value="0">Option 1</option>
+            <option value="1">Option 2</option>
+            <option value="2">Option 3</option>
+            <option value="3">Option 4</option>
+        </select>
+
+        <button class="add-btn" onclick="addQuestion()">
+            Add Question
+        </button>
+
+        <p style="margin-top:15px;">
+            Total Questions:
+            <span id="count">0</span>
+        </p>
+
+    </div>
+
+    <!-- Start Quiz -->
+
+    <div class="card">
+
+        <h2>Take Quiz</h2>
+
+        <button class="start-btn" onclick="startQuiz()">
+            Start Quiz
+        </button>
+
+    </div>
+
+    <!-- Quiz Section -->
+
+    <div class="card" id="quizSection">
+
+        <div class="question-box" id="quizQuestion"></div>
+
+        <div id="options"></div>
+
+        <button class="next-btn" onclick="nextQuestion()">
+            Next Question
+        </button>
+
+    </div>
+
+    <!-- Result -->
+
+    <div class="card" id="resultSection">
+
+        <h2>Quiz Result</h2>
+
+        <div class="score" id="score"></div>
+
+        <div id="review"></div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 Online Quiz Maker | Internship Project
+</footer>
+
+<script>
+
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+
+function addQuestion(){
+
+    let question =
+    document.getElementById("question").value;
+
+    let option1 =
+    document.getElementById("option1").value;
+
+    let option2 =
+    document.getElementById("option2").value;
+
+    let option3 =
+    document.getElementById("option3").value;
+
+    let option4 =
+    document.getElementById("option4").value;
+
+    let correct =
+    document.getElementById("correct").value;
+
+    if(
+        !question ||
+        !option1 ||
+        !option2 ||
+        !option3 ||
+        !option4 ||
+        correct === ""
+    ){
+        alert("Please fill all fields");
+        return;
+    }
+
+    questions.push({
+        question:question,
+        options:[
+            option1,
+            option2,
+            option3,
+            option4
+        ],
+        correct:Number(correct)
+    });
+
+    document.getElementById("count").innerText =
+    questions.length;
+
+    document.getElementById("question").value="";
+    document.getElementById("option1").value="";
+    document.getElementById("option2").value="";
+    document.getElementById("option3").value="";
+    document.getElementById("option4").value="";
+    document.getElementById("correct").value="";
+
+    alert("Question Added Successfully!");
+}
+
+function startQuiz(){
+
+    if(questions.length === 0){
+        alert("Add at least one question.");
+        return;
+    }
+
+    document.getElementById("quizSection")
+    .style.display="block";
+
+    loadQuestion();
+}
+
+function loadQuestion(){
+
+    let q = questions[currentQuestion];
+
+    document.getElementById("quizQuestion")
+    .innerHTML =
+    `Question ${currentQuestion+1}: ${q.question}`;
+
+    let html = "";
+
+    q.options.forEach((option,index)=>{
+
+        html += `
+        <label class="option">
+            <input type="radio"
+            name="answer"
+            value="${index}">
+            ${option}
+        </label>
+        `;
+    });
+
+    document.getElementById("options")
+    .innerHTML = html;
+}
+
+function nextQuestion(){
+
+    let selected =
+    document.querySelector(
+    'input[name="answer"]:checked'
+    );
+
+    if(!selected){
+        alert("Select an answer");
+        return;
+    }
+
+    let answer =
+    Number(selected.value);
+
+    if(
+        answer ===
+        questions[currentQuestion].correct
+    ){
+        score++;
+    }
+
+    currentQuestion++;
+
+    if(currentQuestion < questions.length){
+
+        loadQuestion();
+
+    }else{
+
+        showResult();
+    }
+}
+
+function showResult(){
+
+    document.getElementById("quizSection")
+    .style.display="none";
+
+    document.getElementById("resultSection")
+    .style.display="block";
+
+    document.getElementById("score")
+    .innerHTML =
+    `🎉 Score: ${score} / ${questions.length}`;
+
+    let review = "<h3 style='margin-top:20px'>Correct Answers</h3>";
+
+    questions.forEach((q,index)=>{
+
+        review += `
+        <p style="margin-top:15px;">
+        <b>Q${index+1}: ${q.question}</b><br>
+        ✅ ${q.options[q.correct]}
+        </p>
+        `;
+    });
+
+    document.getElementById("review")
+    .innerHTML = review;
+}
+
+</script>
+
+</body>
+  </html>
